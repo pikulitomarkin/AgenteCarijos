@@ -39,16 +39,27 @@ npm run dev
 ## Endpoints
 
 - `GET /health` - Health check
-- `POST /webhook/evolution` - Webhook da Evolution API
-- `POST /notify/immediate` - Enviar notificação imediata
+- `POST /webhook` - Webhook da Evolution API (recebe eventos do WhatsApp)
+- `POST /send-immediate` - Enviar notificação imediata
   ```json
-  { "appointment_id": "uuid" }
+  {
+    "appointmentId": "uuid",
+    "phone": "5511999999999",
+    "patientName": "João Silva",
+    "doctorName": "Dr. Maria Santos",
+    "date": "2026-03-20",
+    "time": "14:30"
+  }
   ```
+- `POST /test-3days` - Testar job de 3 dias antes
+- `POST /test-24h` - Testar job de 24h antes
 
 ## Jobs Automáticos
 
-- **3 dias antes**: Executa diariamente às 9h
-- **24h antes**: Executa diariamente às 10h
+- **3 dias antes**: Executa diariamente às 08:00 (America/Sao_Paulo)
+- **24h antes**: Executa diariamente às 09:00 (America/Sao_Paulo)
+
+Ambos os jobs buscam agendamentos confirmados e enviam notificações via WhatsApp.
 
 ## Estrutura
 
@@ -75,17 +86,43 @@ whatsapp-worker/
 
 ## Deploy Railway
 
+**URL de Produção:** `https://agentecarijos-production.up.railway.app`
+
 1. Criar novo projeto no Railway
-2. Conectar repositório Git
-3. Configurar variáveis de ambiente
+2. Conectar repositório Git: https://github.com/pikulitomarkin/AgenteCarijos.git
+3. Configurar variáveis de ambiente (ver [RAILWAY_SETUP.md](./RAILWAY_SETUP.md))
 4. Deploy automático
+
+Ver guia completo de configuração: [RAILWAY_SETUP.md](./RAILWAY_SETUP.md)
 
 ## Webhook Evolution API
 
-Configurar webhook na Evolution API apontando para:
-```
-https://seu-dominio.railway.app/webhook/evolution
-```
+**URL Configurada:** `https://agentecarijos-production.up.railway.app/webhook`
+
+Configurar webhook na Evolution API apontando para a URL acima.
 
 Eventos necessários:
 - `messages.upsert` (mensagens recebidas)
+- `messages.update` (atualizações de mensagens)
+
+Ver guia completo: [EVOLUTION_API_SETUP.md](./EVOLUTION_API_SETUP.md)
+
+---
+
+## 📚 Documentação
+
+- [SETUP_INSTRUCTIONS.md](./SETUP_INSTRUCTIONS.md) - Guia de instalação completo
+- [RAILWAY_SETUP.md](./RAILWAY_SETUP.md) - Configuração de variáveis no Railway
+- [EVOLUTION_API_SETUP.md](./EVOLUTION_API_SETUP.md) - Configuração do webhook Evolution API
+- [TESTING_GUIDE.md](./TESTING_GUIDE.md) - Guia de testes
+- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Referência rápida
+- [PROJECT_COMPLETE.md](./PROJECT_COMPLETE.md) - Documentação completa do projeto
+
+---
+
+## 🔗 Links Úteis
+
+- **Produção:** https://agentecarijos-production.up.railway.app
+- **Webhook:** https://agentecarijos-production.up.railway.app/webhook
+- **Health Check:** https://agentecarijos-production.up.railway.app/health
+- **Repositório:** https://github.com/pikulitomarkin/AgenteCarijos.git
