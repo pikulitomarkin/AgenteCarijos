@@ -44,7 +44,7 @@ export async function sendButtons(phone, title, description, footer = '') {
   };
 
   const response = await api.post(
-    `/${process.env.EVOLUTION_INSTANCE}/message/sendButtons`,
+    `/message/sendButtons/${process.env.EVOLUTION_INSTANCE}`,
     payload
   );
 
@@ -63,7 +63,7 @@ export async function sendText(phone, message) {
   };
 
   const response = await api.post(
-    `/${process.env.EVOLUTION_INSTANCE}/message/sendText`,
+    `/message/sendText/${process.env.EVOLUTION_INSTANCE}`,
     payload
   );
 
