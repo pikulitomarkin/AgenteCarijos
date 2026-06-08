@@ -17,34 +17,32 @@ function cleanPhone(phone) {
 }
 
 /**
- * Envia mensagem com botões interativos
+ * Envia mensagem formatada como texto (compatível com Evolution API v2)
+ * A v2 removeu o suporte ao endpoint /message/sendButtons (retornava 400).
+ * As opções de resposta são incluídas no corpo do texto.
  */
 export async function sendButtons(phone, title, description, footer = '') {
   const cleanedPhone = cleanPhone(phone);
-  
+
+  const text = [
+    `*${title}*`,
+    '',
+    description,
+    '',
+    'Responda com uma das opções abaixo:',
+    '1️⃣  *1* - ✅ Confirmar',
+    '2️⃣  *2* - ❌ Cancelar',
+    '3️⃣  *3* - 📅 Reagendar',
+    ...(footer ? ['', `_${footer}_`] : [])
+  ].join('\n');
+
   const payload = {
     number: cleanedPhone,
-    title,
-    description,
-    footer,
-    buttons: [
-      {
-        buttonId: 'CONFIRMAR',
-        buttonText: { displayText: '✅ Confirmar' }
-      },
-      {
-        buttonId: 'CANCELAR',
-        buttonText: { displayText: '❌ Cancelar' }
-      },
-      {
-        buttonId: 'REAGENDAR',
-        buttonText: { displayText: '📅 Reagendar' }
-      }
-    ]
+    text
   };
 
   const response = await api.post(
-    `/message/sendButtons/${process.env.EVOLUTION_INSTANCE}`,
+    `/message/sendText/${process.env.EVOLUTION_INSTANCE}`,
     payload
   );
 
