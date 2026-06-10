@@ -9,6 +9,16 @@ const api = axios.create({
   }
 });
 
+// Pega as instâncias a partir de EVOLUTION_INSTANCES (separadas por vírgula) 
+// ou usa a EVOLUTION_INSTANCE padrão.
+const instances = process.env.EVOLUTION_INSTANCES
+  ? process.env.EVOLUTION_INSTANCES.split(',').map(i => i.trim())
+  : [process.env.EVOLUTION_INSTANCE].filter(Boolean);
+
+if (instances.length === 0) {
+  console.warn("Aviso: Nenhuma instância da Evolution API configurada.");
+}
+
 /**
  * Remove caracteres não numéricos do telefone
  */
@@ -41,12 +51,25 @@ export async function sendButtons(phone, title, description, footer = '') {
     text
   };
 
-  const response = await api.post(
-    `/message/sendText/${process.env.EVOLUTION_INSTANCE}`,
-    payload
-  );
+  let lastError;
 
-  return response.data;
+  for (const instance of instances) {
+    try {
+      const response = await api.post(
+        `/message/sendText/${instance}`,
+        payload
+      );
+      // Se enviou com sucesso, retorna o resultado
+      return response.data;
+    } catch (error) {
+      console.error(`Erro ao enviar sendButtons via instância ${instance}:`, error.message);
+      lastError = error;
+      // Falhou nesta instância, continua o loop para tentar a próxima
+    }
+  }
+
+  // Se todas as instâncias falharem, lança o último erro
+  throw lastError;
 }
 
 /**
@@ -60,10 +83,23 @@ export async function sendText(phone, message) {
     text: message
   };
 
-  const response = await api.post(
-    `/message/sendText/${process.env.EVOLUTION_INSTANCE}`,
-    payload
-  );
+  let lastError;
 
-  return response.data;
+  for (const instance of instances) {
+    try {
+      const response = await api.post(
+        `/message/sendText/${instance}`,
+        payload
+      );
+      // Se enviou com sucesso, retorna o resultado
+      return response.data;
+    } catch (error) {
+      console.error(`Erro ao enviar sendText via instância ${instance}:`, error.message);
+      lastError = error;
+      // Falhou nesta instância, continua o loop para tentar a próxima
+    }
+  }
+
+  // Se todas as instâncias falharem, lança o último erro
+  throw lastError;
 }
